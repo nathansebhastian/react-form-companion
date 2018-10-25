@@ -8,8 +8,20 @@ class App extends Component {
       email: '',
       username: '',
       password: '',
-      formErrors: {email: '', username:'', password: ''},
-      formValidity: {email: false, username: false, password: false},
+      comment: '',
+      passwordConfirmation:'',
+      formErrors: {
+        email: '',
+        username:'', 
+        password: '', 
+        passwordConfirmation: '',
+      },
+      formValidity: {
+        email: false,
+        username: false, 
+        password: false, 
+        passwordConfirmation: false,
+      },
       canSubmit: false,
     };
     this.handleChange = this.handleChange.bind(this)
@@ -26,30 +38,38 @@ class App extends Component {
   }
 
   validateField(name, value) {
-    const fieldValidationErrors = this.state.formErrors
-    const validity = this.state.formValidity
-    const isEmail = name === "email"
-    const isPassword = name === "password"
-    const emailTest = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i
-
-    validity[name] = value.length >0
-    fieldValidationErrors[name] = validity[name] ? '': `${name} is required and cannot be empty`;
-
-    if(validity[name]) {
-      if(isPassword){
-        validity[name] = value.length >= 5;
-        fieldValidationErrors[name] = validity[name] ? '': `${name} should be 5 characters or more`;
-      }
-      if(isEmail){
-        validity[name] = emailTest.test(value);
-        fieldValidationErrors[name] = validity[name] ? '' : `${name} should be a valid email address`;
-      }
-    }
+    if(Object.keys(this.state.formErrors).includes(name)){
+      const fieldValidationErrors = this.state.formErrors
+      const validity = this.state.formValidity
+      const isEmail = name === "email"
+      const isPassword = name === "password"
+      const isPasswordConfirmation = name === "passwordConfirmation"
+      const label = name === "passwordConfirmation"? 'password confirmation' : name
+      const emailTest = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i
   
-    this.setState({
-      formErrors: fieldValidationErrors,
-      formValidity: validity,
-    }, () => this.canSubmit())
+      validity[name] = value.length >0
+      fieldValidationErrors[name] = validity[name] ? '': `${label} is required and cannot be empty`;
+  
+      if(validity[name]) {
+        if(isPassword){
+          validity[name] = value.length >= 5;
+          fieldValidationErrors[name] = validity[name] ? '': `${label} should be 5 characters or more`;
+        }
+        if(isEmail){
+          validity[name] = emailTest.test(value);
+          fieldValidationErrors[name] = validity[name] ? '' : `${label} should be a valid email address`;
+        }
+        if(isPasswordConfirmation){
+          validity[name] = value === this.state.password
+          fieldValidationErrors[name] = validity[name] ? '' : `${label} should match password`;
+        }
+      }
+    
+      this.setState({
+        formErrors: fieldValidationErrors,
+        formValidity: validity,
+      }, () => this.canSubmit())
+    }
   }
 
   canSubmit() {
@@ -119,7 +139,31 @@ class App extends Component {
             onChange={this.handleChange}
           />
           <div className="invalid-feedback">{this.state.formErrors.password}</div>
-        </div>        
+        </div> 
+
+        <div className="form-group">
+          <label htmlFor="passwordConfirmation">Password Confirmation</label>
+          <input
+            className={`form-control ${this.errorClass(this.state.formErrors.passwordConfirmation)}`}
+            id="passwordConfirmation"
+            name ="passwordConfirmation"
+            type="password"
+            placeholder="Enter password again"
+            value={this.state.passwordConfirmation}
+            onChange={this.handleChange}
+          />
+          <div className="invalid-feedback">{this.state.formErrors.passwordConfirmation}</div>
+        </div> 
+
+        <div className="form-group">
+        <label htmlFor="comment"> Comment:</label>
+          <textarea 
+          className="form-control"
+          id="comment"
+          name="comment" 
+          value={this.state.comment} 
+          onChange={this.handleChange} />
+        </div>       
         <button className="btn btn-success btn-block" disabled={!this.state.canSubmit}>Sign up</button>
       </form>
       </React.Fragment>
