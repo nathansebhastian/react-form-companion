@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import './App.css';
 
 class App extends Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
-      email: '',
+      email:  '',
       username: '',
       password: '',
       comment: '',
@@ -25,8 +25,21 @@ class App extends Component {
       canSubmit: false,
     };
     this.handleChange = this.handleChange.bind(this)
+    this.updateData = this.updateData.bind(this)
   }
   
+  updateData(data) {
+    const validity = this.state.formValidity
+    validity.email = true
+    validity['username'] = true
+    this.setState({
+      email: data.email,
+      username: data.username,
+      comment: data.comment,
+      formValidity : validity,
+    })    
+  }
+
   // triggered everytime value changes in our textboxes
   handleChange(event) {
     const {name, value} = event.target
@@ -73,7 +86,7 @@ class App extends Component {
   }
 
   canSubmit() {
-    this.setState({canSubmit: this.state.formValidity.email && this.state.formValidity.username && this.state.formValidity.password})
+    this.setState({canSubmit: this.state.formValidity.email && this.state.formValidity.username && this.state.formValidity.password && this.state.formValidity.passwordConfirmation})
   }
 
   errorClass(error) {
@@ -98,6 +111,14 @@ class App extends Component {
       <React.Fragment>
       <h1>Registration Form</h1>
       <p>Please fill in all textboxes</p> 
+      <h2>Edit User Data</h2>
+      {Object.keys(this.props.users).map(key => (
+        <button 
+        key={key}
+        onClick={() =>this.updateData(this.props.users[key])}
+        >{this.props.users[key].username}</button>
+      ))}
+       
       <form onSubmit={this.handleSubmit}>
         <div className="form-group">
           <label htmlFor="email">Email address</label>
