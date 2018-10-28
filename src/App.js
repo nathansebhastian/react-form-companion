@@ -38,7 +38,7 @@ class App extends Component {
   }
 
   validateField(name, value) {
-    if(Object.keys(this.state.formErrors).includes(name)){
+    if(Object.keys(this.state.formValidity).includes(name)){
       const fieldValidationErrors = this.state.formErrors
       const validity = this.state.formValidity
       const isEmail = name === "email"
@@ -48,20 +48,20 @@ class App extends Component {
       const emailTest = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i
   
       validity[name] = value.length >0
-      fieldValidationErrors[name] = validity[name] ? '': `${label} is required and cannot be empty`;
+      fieldValidationErrors[name] = validity[name] ? '': `${label} is required and cannot be empty`
   
       if(validity[name]) {
         if(isPassword){
           validity[name] = value.length >= 5;
-          fieldValidationErrors[name] = validity[name] ? '': `${label} should be 5 characters or more`;
+          fieldValidationErrors[name] = validity[name] ? '': `${label} should be 5 characters or more`
         }
         if(isEmail){
           validity[name] = emailTest.test(value);
-          fieldValidationErrors[name] = validity[name] ? '' : `${label} should be a valid email address`;
+          fieldValidationErrors[name] = validity[name] ? '' : `${label} should be a valid email address`
         }
         if(isPasswordConfirmation){
           validity[name] = value === this.state.password
-          fieldValidationErrors[name] = validity[name] ? '' : `${label} should match password`;
+          fieldValidationErrors[name] = validity[name] ? '' : `${label} should match password`
         }
       }
     
@@ -91,7 +91,7 @@ class App extends Component {
            Email: ${email} \n 
            Username: ${username} \n
            Password: ${password} \n
-           comment: ${comment || 'no comment'}`
+           Comment: ${comment || 'no comment'}`
     )
   }
   
