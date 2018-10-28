@@ -73,7 +73,7 @@ class App extends Component {
   }
 
   canSubmit() {
-    this.setState({canSubmit: this.state.formValidity.email && this.state.formValidity.username && this.state.formValidity.password})
+    this.setState({ canSubmit: this.state.formValidity.email && this.state.formValidity.username && this.state.formValidity.password && this.state.formValidity.passwordConfirmation })
   }
 
   errorClass(error) {
@@ -85,12 +85,14 @@ class App extends Component {
     // get our const values by destructuring state
     // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Object_destructuring
     event.preventDefault()
-    const { email, username, password } = this.state
+    const { email, username, password, comment } = this.state
     // regular javascript alert function
     alert(`Your registration detail: \n 
            Email: ${email} \n 
            Username: ${username} \n
-           Password: ${password}`)
+           Password: ${password} \n
+           comment: ${comment || 'no comment'}`
+    )
   }
   
   render() {    
