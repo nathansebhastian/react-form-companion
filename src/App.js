@@ -115,6 +115,26 @@ class App extends Component {
            Username: ${username} \n
            Password: ${password}`)
   }
+
+  get previousButton(){
+    let currentStep = this.state.currentStep
+    if(currentStep !==1){
+      return (
+        <button className="btn btn-secondary" type="button" onClick={this._prev}>Previous</button>
+      )
+    }
+    return null
+  }
+
+  get nextButton(){
+    let currentStep = this.state.currentStep
+    if(currentStep <3){
+      return (
+        <button className="btn btn-primary float-right" type="button" onClick={this._next}>Next</button>        
+      )
+    }
+    return null
+  }
   
   render() {    
     return (
@@ -149,8 +169,9 @@ class App extends Component {
           comment={this.state.comment}
           canSubmit={this.state.canSubmit}
         />
-        <button className="btn btn-secondary" type="button" onClick={this._prev}>Previous</button>
-        <button className="btn btn-primary float-right" type="button" onClick={this._next}>Next</button>
+        {this.previousButton}
+        {this.nextButton}
+        
 
       </form>
       </React.Fragment>
