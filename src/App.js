@@ -5,6 +5,7 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      currentStep: 1,
       email:  '',
       username: '',
       password: '',
@@ -25,26 +26,39 @@ class App extends Component {
       canSubmit: false,
     };
     this.handleChange = this.handleChange.bind(this)
-    this.updateData = this.updateData.bind(this)
-  }
-  
-  updateData(data) {
-    const validity = this.state.formValidity
-    validity.email = true
-    validity['username'] = true
-    this.setState({
-      email: data.email,
-      username: data.username,
-      comment: data.comment,
-      formValidity : validity,
-    })    
+    this._next = this._next.bind(this)
+    this._prev = this._prev.bind(this)
   }
 
-  // triggered everytime value changes in our textboxes
+  _next() {
+    let currentStep = this.state.currentStep;
+    if (currentStep >= 2) {
+      currentStep = 3;
+    } else {
+      currentStep = currentStep + 1;
+    }
+    
+    this.setState({
+      currentStep: currentStep
+    });
+  }
+   
+  _prev() {
+    let currentStep = this.state.currentStep;
+    if (currentStep <= 1) {
+      currentStep = 1;
+    } else {
+      currentStep = currentStep - 1;
+    }
+    
+    this.setState({
+      currentStep: currentStep
+    });
+  }
+
   handleChange(event) {
     const {name, value} = event.target
     this.setState({
-      // use dynamic name value to set our state object property
       [name]: value
     }, function(){ this.validateField(name, value)})
     
@@ -61,7 +75,7 @@ class App extends Component {
       const emailTest = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i
   
       validity[name] = value.length >0
-      fieldValidationErrors[name] = validity[name] ? '': `${label} is required and cannot be empty`;
+      fieldValidationErrors[name] = validity[name] ? '': `${label} is required and cannot be empty`
   
       if(validity[name]) {
         if(isPassword){
@@ -70,11 +84,11 @@ class App extends Component {
         }
         if(isEmail){
           validity[name] = emailTest.test(value);
-          fieldValidationErrors[name] = validity[name] ? '' : `${label} should be a valid email address`;
+          fieldValidationErrors[name] = validity[name] ? '' : `${label} should be a valid email address`
         }
         if(isPasswordConfirmation){
           validity[name] = value === this.state.password
-          fieldValidationErrors[name] = validity[name] ? '' : `${label} should match password`;
+          fieldValidationErrors[name] = validity[name] ? '' : `${label} should match password`
         }
       }
     
@@ -90,16 +104,12 @@ class App extends Component {
   }
 
   errorClass(error) {
-    return(error.length === 0 ? '' : 'is-invalid');
+    return(error.length === 0 ? '' : 'is-invalid')
   }
    
-  // triggered on submit
   handleSubmit = (event) => {
-    // get our const values by destructuring state
-    // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Object_destructuring
     event.preventDefault()
     const { email, username, password } = this.state
-    // regular javascript alert function
     alert(`Your registration detail: \n 
            Email: ${email} \n 
            Username: ${username} \n
@@ -109,87 +119,144 @@ class App extends Component {
   render() {    
     return (
       <React.Fragment>
-      <h1>Registration Form</h1>
-      <p>Please fill in all textboxes</p> 
-      <h2>Edit User Data</h2>
-      {Object.keys(this.props.users).map(key => (
-        <button 
-        key={key}
-        onClick={() =>this.updateData(this.props.users[key])}
-        >{this.props.users[key].username}</button>
-      ))}
+      <h1>A Wizard Form!</h1>
+      <p>Step {this.state.currentStep} </p> 
        
       <form onSubmit={this.handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="email">Email address</label>
-          <input
-            className={`form-control ${this.errorClass(this.state.formErrors.email)}`}
-            id="email"
-            name="email"
-            type="text"
-            placeholder="Enter email"
-            value={this.state.email}
-            onChange={this.handleChange}
-          />
-          <div className="invalid-feedback">{this.state.formErrors.email}</div>
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="username">Username</label>
-          <input
-            className={`form-control ${this.errorClass(this.state.formErrors.username)}`}
-            id="username"
-            name="username"
-            type="text"
-            placeholder="Enter username"
-            value={this.state.username}
-            onChange={this.handleChange}
-          />
-          <div className="invalid-feedback">{this.state.formErrors.username}</div>
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            className={`form-control ${this.errorClass(this.state.formErrors.password)}`}
-            id="password"
-            name ="password"
-            type="password"
-            placeholder="Enter password"
-            value={this.state.password}
-            onChange={this.handleChange}
-          />
-          <div className="invalid-feedback">{this.state.formErrors.password}</div>
-        </div> 
+        <Step1 
+          currentStep={this.state.currentStep} 
+          handleChange={this.handleChange}
+          errorEmailClass={this.errorClass(this.state.formErrors.email)}
+          email={this.state.email}
+          errorEmail={this.state.formErrors.email}
+          errorUsernameClass={this.errorClass(this.state.formErrors.username)}
+          username={this.state.username}
+          errorUsername={this.state.formErrors.username}
+        />
+        <Step2 
+        currentStep={this.state.currentStep} 
+        handleChange={this.handleChange}
+        errorPasswordClass={this.errorClass(this.state.formErrors.password)}
+        password={this.state.password}
+        errorPassword={this.state.formErrors.password}
+        errorPasswordConfirmationClass={this.errorClass(this.state.formErrors.passwordConfirmation)}
+        passwordConfirmation={this.state.passwordConfirmation}
+        errorPasswordConfirmation={this.state.formErrors.passwordConfirmation}
+        />
+        <Step3 
+          currentStep={this.state.currentStep} 
+          handleChange={this.handleChange}
+          comment={this.state.comment}
+          canSubmit={this.state.canSubmit}
+        />
+        <button className="btn btn-secondary" type="button" onClick={this._prev}>Previous</button>
+        <button className="btn btn-primary float-right" type="button" onClick={this._next}>Next</button>
 
-        <div className="form-group">
-          <label htmlFor="passwordConfirmation">Password Confirmation</label>
-          <input
-            className={`form-control ${this.errorClass(this.state.formErrors.passwordConfirmation)}`}
-            id="passwordConfirmation"
-            name ="passwordConfirmation"
-            type="password"
-            placeholder="Enter password again"
-            value={this.state.passwordConfirmation}
-            onChange={this.handleChange}
-          />
-          <div className="invalid-feedback">{this.state.formErrors.passwordConfirmation}</div>
-        </div> 
-
-        <div className="form-group">
-        <label htmlFor="comment"> Comment:</label>
-          <textarea 
-          className="form-control"
-          id="comment"
-          name="comment" 
-          value={this.state.comment} 
-          onChange={this.handleChange} />
-        </div>       
-        <button className="btn btn-success btn-block" disabled={!this.state.canSubmit}>Sign up</button>
       </form>
       </React.Fragment>
     )
   }
 }
 
+class Step1 extends Component {
+  render() {
+    if (this.props.currentStep !== 1) {
+      return null
+    } 
+    return(
+      <React.Fragment>
+      <div className="form-group">
+        <label htmlFor="email">Email address</label>
+        <input
+          className={`form-control ${this.props.errorEmailClass}`}
+          id="email"
+          name="email"
+          type="text"
+          placeholder="Enter email"
+          value={this.props.email}
+          onChange={this.props.handleChange}
+        />
+        <div className="invalid-feedback">{this.props.errorEmail}</div>
+      </div>
+      <div className="form-group">
+      <label htmlFor="username">Username</label>
+      <input
+        className={`form-control ${this.props.errorUsernameClass}`}
+        id="username"
+        name="username"
+        type="text"
+        placeholder="Enter username"
+        value={this.props.username}
+        onChange={this.props.handleChange}
+      />
+      <div className="invalid-feedback">{this.props.errorUsername}</div>
+    </div>
+    </React.Fragment>
+   );
+ }
+}
+
+class Step2 extends Component {
+  render() {
+    if (this.props.currentStep !== 2) {
+      return null;
+    } 
+    return(
+    <React.Fragment>
+    <div className="form-group">
+        <label htmlFor="password">Password</label>
+        <input
+          className={`form-control ${this.props.errorPasswordClass}`}
+          id="password"
+          name ="password"
+          type="password"
+          placeholder="Enter password"
+          value={this.props.password}
+          onChange={this.props.handleChange}
+        />
+        <div className="invalid-feedback">{this.props.errorPassword}</div>
+      </div> 
+
+      <div className="form-group">
+        <label htmlFor="passwordConfirmation">Password Confirmation</label>
+        <input
+          className={`form-control ${this.props.errorPasswordConfirmationClass}`}
+          id="passwordConfirmation"
+          name ="passwordConfirmation"
+          type="password"
+          placeholder="Enter password again"
+          value={this.props.passwordConfirmation}
+          onChange={this.props.handleChange}
+        />
+        <div className="invalid-feedback">{this.props.errorPasswordConfirmation}</div>
+      </div>
+    </React.Fragment>
+  );
+ }
+}
+
+class Step3 extends Component {
+  render() {
+    if (this.props.currentStep !== 3) {
+      return null;
+    } 
+    return(
+    <React.Fragment>
+      <div className="form-group">
+        <label htmlFor="comment"> Comment:</label>
+          <textarea 
+          className="form-control"
+          id="comment"
+          name="comment" 
+          value={this.props.comment} 
+          onChange={this.props.handleChange} />
+      </div>       
+      <button className="btn btn-success btn-block" disabled={!this.props.canSubmit}>Sign up</button>
+    </React.Fragment>
+  );
+ }
+}
+
 export default App;
+
+
