@@ -10,19 +10,23 @@ class App extends Component {
       password: '',
       comment: '',
       passwordConfirmation:'',
+      facebook:'',
       formErrors: {
         email: '',
         username:'', 
         password: '', 
         passwordConfirmation: '',
+        facebook: '',
       },
       formValidity: {
         email: false,
         username: false, 
         password: false, 
         passwordConfirmation: false,
+        facebook: false,
       },
       canSubmit: false,
+      facebookRadio: "no",
     };
     this.handleChange = this.handleChange.bind(this)
     this.updateData = this.updateData.bind(this)
@@ -40,11 +44,9 @@ class App extends Component {
     })    
   }
 
-  // triggered everytime value changes in our textboxes
   handleChange(event) {
     const {name, value} = event.target
     this.setState({
-      // use dynamic name value to set our state object property
       [name]: value
     }, function(){ this.validateField(name, value)})
     
@@ -93,17 +95,37 @@ class App extends Component {
     return(error.length === 0 ? '' : 'is-invalid');
   }
    
-  // triggered on submit
   handleSubmit = (event) => {
-    // get our const values by destructuring state
-    // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Object_destructuring
     event.preventDefault()
     const { email, username, password } = this.state
-    // regular javascript alert function
     alert(`Your registration detail: \n 
            Email: ${email} \n 
            Username: ${username} \n
            Password: ${password}`)
+  }
+
+  get facebookLinkInput(){
+    let {facebookRadio} = this.state
+    if(facebookRadio === "yes"){
+      return (
+        <div className="form-group">
+          <label htmlFor="facebook">Facebook Link</label>
+          <input
+            className={`form-control ${this.errorClass(this.state.formErrors.facebook)}`}
+            id="facebook"
+            name="facebook"
+            type="text"
+            placeholder="Enter Facebook url"
+            value={this.state.facebook}
+            onChange={this.handleChange}
+          />
+          <div className="invalid-feedback">{this.state.formErrors.facebook}</div>
+        </div>
+      )
+
+    }
+    return false
+
   }
   
   render() {    
@@ -174,7 +196,29 @@ class App extends Component {
             onChange={this.handleChange}
           />
           <div className="invalid-feedback">{this.state.formErrors.passwordConfirmation}</div>
-        </div> 
+        </div>
+
+        <fieldset className="form-group">
+          <div className="row">
+            <legend className="col-form-label col-sm-2 pt-0">Facebook Account</legend>
+            <div className="col-sm-10">
+              <div className="form-check form-check-inline">
+                <input className="form-check-input" type="radio" name="facebookRadio" id="facebookRadio1" value="no" checked={this.state.facebookRadio==="no"} onChange={this.handleChange}/>
+                <label className="form-check-label" htmlFor="facebookRadio1">
+                  No
+                </label>
+              </div>
+              <div className="form-check form-check-inline">
+                <input className="form-check-input" type="radio" name="facebookRadio" id="facebookRadio2" value="yes" checked={this.state.facebookRadio==="yes"} onChange={this.handleChange}/>
+                <label className="form-check-label" htmlFor="facebookRadio2">
+                  Yes
+                </label>
+              </div>
+            </div>
+          </div>
+        </fieldset> 
+
+        {this.facebookLinkInput}
 
         <div className="form-group">
         <label htmlFor="comment"> Comment:</label>
